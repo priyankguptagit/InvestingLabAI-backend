@@ -1,0 +1,925 @@
+{
+  "info": {
+    "name": "Praedico Organization System - Complete API",
+    "_postman_id": "praedico-org-system-v1",
+    "description": "Complete API collection for Praedico's multi-tenant organization management system",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "orgAdminToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "coordinatorToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "organizationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "departmentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "coordinatorId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "studentId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "yourEmail",
+      "value": "your-email@gmail.com",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. ORGANIZATION MANAGEMENT",
+      "item": [
+        {
+          "name": "1.1 Register Organization",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('organizationId', jsonData.organizationId);",
+                  "    pm.environment.set('organizationId', jsonData.organizationId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"organizationName\": \"MIT Indore\",\n  \"organizationType\": \"institute\",\n  \"address\": \"Rau-Pithampur Road, Bypass\",\n  \"city\": \"Indore\",\n  \"state\": \"Madhya Pradesh\",\n  \"pincode\": \"453331\",\n  \"country\": \"India\",\n  \"contactEmail\": \"{{yourEmail}}\",\n  \"contactPhone\": \"9876543210\",\n  \"website\": \"https://mitindore.edu.in\",\n  \"registeredBy\": {\n    \"name\": \"Dr. Rajesh Kumar\",\n    \"email\": \"{{yourEmail}}\",\n    \"designation\": \"Director\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/organization/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "organization", "register"]
+            },
+            "description": "⚠️ IMPORTANT: Check email for verification token after this request!"
+          },
+          "response": []
+        },
+        {
+          "name": "1.2 Verify Organization Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    const cookies = pm.cookies.toObject();",
+                  "    if (cookies.accessToken) {",
+                  "        pm.collectionVariables.set('orgAdminToken', cookies.accessToken);",
+                  "        pm.environment.set('orgAdminToken', cookies.accessToken);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"PASTE_TOKEN_FROM_EMAIL_HERE\",\n  \"password\": \"SecureOrgPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/organization/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "organization", "verify"]
+            },
+            "description": "⚠️ REPLACE 'PASTE_TOKEN_FROM_EMAIL_HERE' with actual token from your email!"
+          },
+          "response": []
+        },
+        {
+          "name": "1.3 Login Organization Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const cookies = pm.cookies.toObject();",
+                  "    if (cookies.accessToken) {",
+                  "        pm.collectionVariables.set('orgAdminToken', cookies.accessToken);",
+                  "        pm.environment.set('orgAdminToken', cookies.accessToken);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{yourEmail}}\",\n  \"password\": \"SecureOrgPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/organization/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "organization", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.4 Get Organization Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/organization/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "organization", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.5 Get Organization Statistics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/organization/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "organization", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "1.6 Get Public Organizations List",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/organization/public/list",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "organization", "public", "list"]
+            },
+            "description": "Used for registration dropdown (no auth required)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. DEPARTMENT MANAGEMENT",
+      "item": [
+        {
+          "name": "2.1 Create Department - CSE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('departmentId', jsonData.department._id);",
+                  "    pm.environment.set('departmentId', jsonData.department._id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"departmentName\": \"Computer Science & Engineering\",\n  \"departmentCode\": \"CSE\",\n  \"description\": \"Department of Computer Science and Engineering\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/department",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "department"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.2 Create Department - ECE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"departmentName\": \"Electronics & Communication\",\n  \"departmentCode\": \"ECE\",\n  \"description\": \"Department of Electronics and Communication Engineering\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/department",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "department"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.3 Create Department - MECH",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"departmentName\": \"Mechanical Engineering\",\n  \"departmentCode\": \"MECH\",\n  \"description\": \"Department of Mechanical Engineering\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/department",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "department"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.4 Get All Departments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/department",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "department"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.5 Get Department Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/department/{{departmentId}}/details",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "department", "{{departmentId}}", "details"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "2.6 Get Public Departments by Organization",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/department/public/{{organizationId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "department", "public", "{{organizationId}}"]
+            },
+            "description": "Used for student registration dropdown (no auth required)"
+          },
+          "response": []
+        },
+        {
+          "name": "2.7 Update Department",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated department description\",\n  \"isActive\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/department/{{departmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "department", "{{departmentId}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. COORDINATOR MANAGEMENT",
+      "item": [
+        {
+          "name": "3.1 Create Coordinator (by Org Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('coordinatorId', jsonData.coordinatorId);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"departmentId\": \"{{departmentId}}\",\n  \"name\": \"Dr. Priya Sharma\",\n  \"email\": \"{{yourEmail}}\",\n  \"mobile\": \"9876543211\",\n  \"designation\": \"hod\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator"]
+            },
+            "description": "⚠️ Change email to your email to receive coordinator invite!"
+          },
+          "response": []
+        },
+        {
+          "name": "3.2 Verify Coordinator Email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const cookies = pm.cookies.toObject();",
+                  "    if (cookies.accessToken) {",
+                  "        pm.collectionVariables.set('coordinatorToken', cookies.accessToken);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"PASTE_COORDINATOR_TOKEN_FROM_EMAIL\",\n  \"password\": \"CoordPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator", "verify"]
+            },
+            "description": "⚠️ Check email for coordinator verification token!"
+          },
+          "response": []
+        },
+        {
+          "name": "3.3 Login Coordinator",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const cookies = pm.cookies.toObject();",
+                  "    if (cookies.accessToken) {",
+                  "        pm.collectionVariables.set('coordinatorToken', cookies.accessToken);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{yourEmail}}\",\n  \"password\": \"CoordPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.4 Get Coordinator Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{coordinatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "3.5 Get All Coordinators (Org Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator/all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator", "all"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. STUDENT REGISTRATION & APPROVAL",
+      "item": [
+        {
+          "name": "4.1 Register Student WITH Organization",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Store student email for later use",
+                  "pm.collectionVariables.set('studentEmail', 'sambhav.student@gmail.com');"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{yourEmail}}\",\n  \"name\": \"Sambhav Student\",\n  \"organizationId\": \"{{organizationId}}\",\n  \"departmentId\": \"{{departmentId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "register"]
+            },
+            "description": "⚠️ Use YOUR email here to receive verification + approval notifications will go to org admin & coordinator!"
+          },
+          "response": []
+        },
+        {
+          "name": "4.2 Verify Student Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"PASTE_STUDENT_TOKEN_FROM_EMAIL\",\n  \"password\": \"Student123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "verify"]
+            },
+            "description": "⚠️ Check email for student verification token!"
+          },
+          "response": []
+        },
+        {
+          "name": "4.3 Student Login (SHOULD FAIL - Pending)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{yourEmail}}\",\n  \"password\": \"Student123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "login"]
+            },
+            "description": "✅ This should FAIL with 'pending approval' message!"
+          },
+          "response": []
+        },
+        {
+          "name": "4.4 Get Pending Students (Coordinator)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    if (jsonData.students && jsonData.students.length > 0) {",
+                  "        pm.collectionVariables.set('studentId', jsonData.students[0]._id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{coordinatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator/students/pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator", "students", "pending"]
+            },
+            "description": "Shows pending students in coordinator's department only"
+          },
+          "response": []
+        },
+        {
+          "name": "4.5 Approve Student (Coordinator)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{coordinatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator/students/{{studentId}}/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator", "students", "{{studentId}}", "approve"]
+            },
+            "description": "✅ After this, student will receive approval email!"
+          },
+          "response": []
+        },
+        {
+          "name": "4.6 Student Login (NOW SUCCESS!)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const cookies = pm.cookies.toObject();",
+                  "    if (cookies.accessToken) {",
+                  "        pm.collectionVariables.set('studentToken', cookies.accessToken);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{yourEmail}}\",\n  \"password\": \"Student123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "login"]
+            },
+            "description": "✅ This should now SUCCESS after approval!"
+          },
+          "response": []
+        },
+        {
+          "name": "4.7 Get Pending Students (Org Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/organization/students/pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "organization", "students", "pending"]
+            },
+            "description": "Shows ALL pending students from ALL departments"
+          },
+          "response": []
+        },
+        {
+          "name": "4.8 Approve Student (Org Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/organization/students/{{studentId}}/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "organization", "students", "{{studentId}}", "approve"]
+            },
+            "description": "Org admin can approve students from ANY department"
+          },
+          "response": []
+        },
+        {
+          "name": "4.9 Reject Student (Coordinator)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "accessToken={{coordinatorToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Invalid enrollment number or documents\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator/students/{{studentId}}/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator", "students", "{{studentId}}", "reject"]
+            },
+            "description": "Student will receive rejection email with reason"
+          },
+          "response": []
+        },
+        {
+          "name": "4.10 Get All Students (Org Admin)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{orgAdminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/organization/students?status=approved&departmentId={{departmentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "organization", "students"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "approved",
+                  "description": "Filter by status: pending, approved, rejected"
+                },
+                {
+                  "key": "departmentId",
+                  "value": "{{departmentId}}",
+                  "description": "Filter by department (optional)"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "4.11 Get Students in My Department (Coordinator)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "accessToken={{coordinatorToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/coordinator/students?status=approved",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "coordinator", "students"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "approved",
+                  "description": "Filter by status (optional)"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. INDIVIDUAL USER (NO ORG)",
+      "item": [
+        {
+          "name": "5.1 Register Individual User (No Org)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{yourEmail}}\",\n  \"name\": \"Individual Trader\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "register"]
+            },
+            "description": "No organizationId/departmentId = Individual user (can login immediately after verification)"
+          },
+          "response": []
+        },
+        {
+          "name": "5.2 Verify Individual User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"PASTE_TOKEN_FROM_EMAIL\",\n  \"password\": \"IndividualPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "verify"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "5.3 Login Individual User (Immediate Success)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{yourEmail}}\",\n  \"password\": \"IndividualPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "login"]
+            },
+            "description": "✅ No approval needed for individual users!"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
