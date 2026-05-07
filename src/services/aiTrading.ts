@@ -21,7 +21,7 @@ class AITradingService {
   private aiChatbotEndpoint: string;
 
   constructor() {
-    this.aiChatbotEndpoint = process.env.AI_CHATBOT_URL || 'http://localhost:5001/api/ai/chat/message';
+    this.aiChatbotEndpoint = process.env.AI_CHATBOT_URL || `${ENV.BACKEND_URL}/api/ai/chat/message`;
   }
 
   // ✅ 1. ADD THIS HELPER METHOD

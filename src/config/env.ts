@@ -12,6 +12,7 @@ const getEnv = (key: string, defaultValue?: string): string => {
 
 export const ENV = {
   PORT: getEnv('PORT', '5001'),
+  BACKEND_URL: getEnv('BACKEND_URL', 'http://localhost:5001'),
   
   // Database
   MONGODB_URI: getEnv('MONGODB_URI'),
@@ -30,7 +31,7 @@ export const ENV = {
   EMAIL_PASS: getEnv('EMAIL_PASS'),
   
   // Frontend
-  FRONTEND_URL: getEnv('FRONTEND_URL', 'https://praedico-frontend.vercel.app'),
+  FRONTEND_URL: getEnv('FRONTEND_URL', 'https://investinglabai.com,https://investing-lab-ai-frontend-huazomw86.vercel.app'),
   
   // AI Configuration
   GEMINI_API_KEY: getEnv('GEMINI_API_KEY'),

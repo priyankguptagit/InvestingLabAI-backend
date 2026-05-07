@@ -40,12 +40,7 @@ export const createApp = (): Application => {
   app.use(securityHeaders);
   app.use(
     cors({
-      origin: [
-        "http://localhost:3000",                      // For Local Development
-        "https://praedico-frontend.vercel.app",       // YOUR VERCEL FRONTEND
-        "https://www.praedico-frontend.vercel.app",   // Optional 'www' subdomain
-        ENV.FRONTEND_URL                               // Keep env variable as backup
-      ],
+      origin: ENV.FRONTEND_URL.split(',').map(u => u.trim()),
       credentials: true,
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
       exposedHeaders: ["X-Session-Expires-At"],

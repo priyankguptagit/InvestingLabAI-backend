@@ -21,7 +21,7 @@ export class TradingSocketServer {
   constructor(httpServer: HTTPServer) {
     this.io = new SocketIOServer(httpServer, {
       cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+        origin: ENV.FRONTEND_URL.split(',').map(u => u.trim()),
         methods: ['GET', 'POST'],
         credentials: true
       },
