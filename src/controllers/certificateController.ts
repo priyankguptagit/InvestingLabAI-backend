@@ -34,18 +34,15 @@ export const validateCertificate = async (req: Request, res: Response, next: Nex
       return;
     }
 
-    // Prepare search variations (as-is, PRD-, PGR-)
-    const cleanCode = certificateCode.replace(/^(PRD-|PGR-)/i, '');
-    const searchCodes = [
-      certificateCode,
-      `PRD-${cleanCode}`,
-      `PGR-${cleanCode}`,
-      cleanCode
-    ];
+    // Enforce strict PGR- prefix
+    const cleanCode = certificateCode.replace(/^(PRD-|PGR-|CERT-)/i, '').trim();
+    const exactSearchCode = `PGR-${cleanCode}`;
+
+    console.log(`[CertificateValidation] Strictly searching for: ${exactSearchCode}`);
 
     // Find certificate and populate user to check name
     const certificate = await CertificateModel.findOne({
-      certificateNumber: { $in: searchCodes.map(c => c.trim()) }
+      certificateNumber: exactSearchCode
     }).populate('user', 'name');
 
     if (!certificate) {
