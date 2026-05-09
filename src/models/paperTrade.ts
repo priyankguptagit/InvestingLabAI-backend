@@ -28,7 +28,7 @@ export interface IPaperTrade extends Document {
   realizedPL?: number;
   
   // Metadata
-  category: 'NIFTY50' | 'NIFTY100' | 'ETF';
+  category: 'NIFTY50' | 'NIFTY100' | 'NIFTY500' | 'ETF';
   tradingSession: string; // Date identifier
 }
 
@@ -73,7 +73,7 @@ const PaperTradeSchema: Schema = new Schema({
   realizedPL: { type: Number, default: 0 },
   
   // Metadata
-  category: { type: String, enum: ['NIFTY50', 'NIFTY100', 'ETF'] },
+  category: { type: String, enum: ['NIFTY50', 'NIFTY100', 'NIFTY500', 'ETF'] },
   tradingSession: { type: String, required: true }
 }, { 
   timestamps: true 

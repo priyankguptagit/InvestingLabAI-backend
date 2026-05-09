@@ -95,7 +95,7 @@ export class FeedbackController {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    let authorModel = 'User';
+    let authorModel: 'User' | 'OrganizationAdmin' | 'DepartmentCoordinator' = 'User';
     if (user.role === 'organization_admin') authorModel = 'OrganizationAdmin';
     else if (user.role === 'department_coordinator') authorModel = 'DepartmentCoordinator';
 

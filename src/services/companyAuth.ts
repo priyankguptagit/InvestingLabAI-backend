@@ -199,7 +199,7 @@ export class CompanyAuthService {
             await CompanyActivityLogModel.create({
                 action: 'ROLE_ASSIGNED',
                 details: `Assigned role "${role.name}" to employee ${member.email}.`,
-                performedBy: memberId, // Not technically correct since performedBy is whoever called it, but we lack caller ID here without massive refactoring. Let's just track the employee ID to ensure we record *something*.
+                performedBy: memberId as any, // Not technically correct since performedBy is whoever called it, but we lack caller ID here without massive refactoring. Let's just track the employee ID to ensure we record *something*.
                 targetId: member._id,
                 targetModel: 'CompanyMember'
             });
@@ -209,7 +209,7 @@ export class CompanyAuthService {
             await CompanyActivityLogModel.create({
                 action: 'ROLE_ASSIGNED',
                 details: `Unassigned role from employee ${member.email}.`,
-                performedBy: memberId,
+                performedBy: memberId as any,
                 targetId: member._id,
                 targetModel: 'CompanyMember'
             });
@@ -255,7 +255,7 @@ export class CompanyAuthService {
         await CompanyActivityLogModel.create({
             action: 'ROLE_CREATED',
             details: `Created custom role "${role.name}".`,
-            performedBy: createdById,
+            performedBy: createdById as any,
             targetId: role._id,
             targetModel: 'CompanyRole'
         });
@@ -281,7 +281,7 @@ export class CompanyAuthService {
         await CompanyActivityLogModel.create({
             action: 'ROLE_UPDATED',
             details: `Updated custom role "${role.name}".`,
-            performedBy: updatedById,
+            performedBy: updatedById as any,
             targetId: role._id,
             targetModel: 'CompanyRole'
         });
@@ -361,7 +361,7 @@ export class CompanyAuthService {
         await CompanyActivityLogModel.create({
             action: 'EMPLOYEE_CREATED',
             details: `Invited new employee: ${member.email}.`,
-            performedBy: performedById,
+            performedBy: performedById as any,
             targetId: member._id,
             targetModel: 'CompanyMember',
         });
@@ -391,7 +391,7 @@ export class CompanyAuthService {
         await CompanyActivityLogModel.create({
             action: 'EMPLOYEE_CREATED',
             details: `Resent invitation to employee: ${member.email}.`,
-            performedBy: performedById,
+            performedBy: performedById as any,
             targetId: member._id,
             targetModel: 'CompanyMember',
         });
@@ -421,7 +421,7 @@ export class CompanyAuthService {
         await CompanyActivityLogModel.create({
             action: 'EMPLOYEE_UPDATED',
             details: `Updated employee profile: ${member.email}.`,
-            performedBy: performedById,
+            performedBy: performedById as any,
             targetId: member._id,
             targetModel: 'CompanyMember',
         });
@@ -440,7 +440,7 @@ export class CompanyAuthService {
         await CompanyActivityLogModel.create({
             action: 'EMPLOYEE_DELETED',
             details: `Deleted employee: ${member.email}.`,
-            performedBy: performedById,
+            performedBy: performedById as any,
             targetId: member._id,
             targetModel: 'CompanyMember',
         });
@@ -463,7 +463,7 @@ export class CompanyAuthService {
         await CompanyActivityLogModel.create({
             action: 'EMPLOYEE_BLOCKED',
             details: `${member.isActive ? 'Unblocked' : 'Blocked'} employee: ${member.email}.`,
-            performedBy: performedById,
+            performedBy: performedById as any,
             targetId: member._id,
             targetModel: 'CompanyMember',
         });

@@ -21,7 +21,7 @@ export interface IFeedback extends Document {
   factorRatings: IFactorRating[];
   /** Auto-computed mean of factorRatings, or the legacy single testimonial rating */
   rating?: number;
-  portal: 'user' | 'organization' | 'coordinator' | 'public';
+  portal: 'user' | 'organization' | 'coordinator' | 'admin' | 'public';
   status: 'pending' | 'approved' | 'rejected' | 'resolved';
   createdAt: Date;
   updatedAt: Date;
@@ -62,7 +62,7 @@ const FeedbackSchema: Schema = new Schema(
     rating: { type: Number, min: 1, max: 5 },
     portal: {
       type: String,
-      enum: ['user', 'organization', 'coordinator', 'public'],
+      enum: ['user', 'organization', 'coordinator', 'admin', 'public'],
       required: true,
     },
     status: {

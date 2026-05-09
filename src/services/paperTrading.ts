@@ -71,7 +71,7 @@ class PaperTradingService {
         totalAmount,
         status: 'EXECUTED',
         executedAt: new Date(),
-        category: stockData.category,
+        category: stockData.category as any,
         tradingSession: new Date().toISOString().split('T')[0],
         reason
       }], { session });
@@ -134,7 +134,7 @@ class PaperTradingService {
     type: 'BUY' | 'SELL',
     quantity: number,
     price: number,
-    category: string,
+    category: 'NIFTY50' | 'NIFTY100' | 'NIFTY500' | 'ETF',
     session: any
   ) {
     const holding = await PortfolioHolding.findOne({ userId, symbol }).session(session);

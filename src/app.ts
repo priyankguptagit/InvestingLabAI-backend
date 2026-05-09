@@ -124,6 +124,7 @@ export const createApp = (): Application => {
     '/api/company/verify-employee',   // public: invited employees set password here
     '/api/feedback/public/testimonials',
     '/api/referrals/validate',
+    '/api/certificates/validate',
     '/health',
   ];
 

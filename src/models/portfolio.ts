@@ -17,7 +17,7 @@ export interface IPortfolioHolding extends Document {
   aiRecommendedAction?: 'HOLD' | 'BUY_MORE' | 'SELL' | 'STOP_LOSS';
   lastAIAnalysisDate?: Date;
   
-  category: 'NIFTY50' | 'NIFTY100' | 'ETF';
+  category: 'NIFTY50' | 'NIFTY100' | 'NIFTY500' | 'ETF';
   lastUpdated: Date;
 }
 
@@ -46,7 +46,7 @@ const PortfolioHoldingSchema: Schema = new Schema({
   },
   lastAIAnalysisDate: { type: Date },
   
-  category: { type: String, enum: ['NIFTY50', 'NIFTY100', 'ETF'] },
+  category: { type: String, enum: ['NIFTY50', 'NIFTY100', 'NIFTY500', 'ETF'] },
   lastUpdated: { type: Date, default: Date.now }
 }, { 
   timestamps: true 
