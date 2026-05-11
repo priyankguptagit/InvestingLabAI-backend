@@ -297,7 +297,7 @@ export class CompanyAuthService {
         await CompanyActivityLogModel.create({
             action: 'ROLE_DELETED',
             details: `Deleted custom role "${role.name}".`,
-            performedBy: role.createdBy, // Best effort
+            performedBy: role.createdBy as any, // Best effort
             targetId: role._id,
             targetModel: 'CompanyRole'
         });

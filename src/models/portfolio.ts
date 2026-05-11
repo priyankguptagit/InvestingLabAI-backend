@@ -46,7 +46,7 @@ const PortfolioHoldingSchema: Schema = new Schema({
   },
   lastAIAnalysisDate: { type: Date },
   
-  category: { type: String, enum: ['NIFTY50', 'NIFTY100', 'NIFTY500', 'ETF'] },
+  category: { type: String, enum: ['NIFTY50', 'NIFTY100', 'NIFTY500', 'ETF'], required: true },
   lastUpdated: { type: Date, default: Date.now }
 }, { 
   timestamps: true 

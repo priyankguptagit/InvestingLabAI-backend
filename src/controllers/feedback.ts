@@ -24,7 +24,7 @@ const submitFeedbackSchema = z.discriminatedUnion('type', [
   // New multi-factor experience rating
   z.object({
     type: z.literal('multi_factor'),
-    portal: z.enum(['user', 'organization', 'admin', 'public']),
+    portal: z.enum(['user', 'organization', 'coordinator', 'public']),
     factorRatings: z
       .array(factorRatingSchema)
       .length(6, 'All 6 factor ratings are required')
@@ -37,7 +37,7 @@ const submitFeedbackSchema = z.discriminatedUnion('type', [
   // Bug / feature_request / general
   z.object({
     type: z.enum(['bug', 'feature_request', 'general']),
-    portal: z.enum(['user', 'organization', 'admin', 'public']),
+    portal: z.enum(['user', 'organization', 'coordinator', 'public']),
     content: z.string().min(5, 'Content must be at least 5 characters').max(2000),
     factorRatings: z.undefined().optional(),
     rating: z.undefined().optional(),
@@ -45,7 +45,7 @@ const submitFeedbackSchema = z.discriminatedUnion('type', [
   // Legacy testimonial (backward-compat)
   z.object({
     type: z.literal('testimonial'),
-    portal: z.enum(['user', 'organization', 'admin', 'public']),
+    portal: z.enum(['user', 'organization', 'coordinator', 'public']),
     content: z.string().min(5, 'Content must be at least 5 characters').max(2000),
     rating: z.number().int().min(1).max(5).optional(),
     factorRatings: z.undefined().optional(),
@@ -95,7 +95,7 @@ export class FeedbackController {
       return res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 
-    let authorModel: 'User' | 'OrganizationAdmin' | 'DepartmentCoordinator' = 'User';
+    let authorModel: 'User' | 'OrganizationAdmin' | 'DepartmentCoordinator' | 'CompanyMember' = 'User';
     if (user.role === 'organization_admin') authorModel = 'OrganizationAdmin';
     else if (user.role === 'department_coordinator') authorModel = 'DepartmentCoordinator';
 
