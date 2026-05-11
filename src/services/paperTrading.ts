@@ -144,7 +144,7 @@ class PaperTradingService {
     type: 'BUY' | 'SELL',
     quantity: number,
     price: number,
-    category: string,
+    category: 'NIFTY50' | 'NIFTY100' | 'NIFTY500' | 'ETF',
     session: any
   ) {
     const holding = await PortfolioHolding.findOne({ userId, symbol }).session(session);

@@ -163,7 +163,7 @@ export class UserService {
     // Scope to valid UserModel roles only — skips any stale super_admin / admin /
     // employee documents that may still exist in this collection after migration
     // to the CompanyMember collection.
-    const VALID_USER_ROLES = ['user', 'organization_admin', 'department_coordinator'];
+    const VALID_USER_ROLES = ['user', 'organization_admin', 'department_coordinator'] as const;
     const user = await UserModel.findOne({ email, role: { $in: VALID_USER_ROLES } });
     // Security Best Practice: Don't reveal if user exists or not
     if (!user) throw new Error("If email exists, a reset link has been sent");
