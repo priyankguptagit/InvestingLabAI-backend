@@ -6,6 +6,7 @@ import { ReferralCodeModel } from '../models/referralCode';
 import { CommissionLogModel } from '../models/commissionLog';
 import { PaymentRecordModel } from '../models/paymentRecord';
 import { PLAN_PRICES_PAISE, PlanName, Duration } from '../config/pricing.config';
+import { getPlanLimits } from '../config/plans';
 import { sendPaymentConfirmationEmail } from '../services/email';
 import crypto from 'crypto';
 
@@ -160,12 +161,20 @@ export const verifyOrder = async (req: AuthRequest, res: Response) => {
     const expiryDate = new Date();
     expiryDate.setMonth(expiryDate.getMonth() + Number(duration));
 
+    // Grant the plan's initial virtual balance
+    const planLimits = getPlanLimits(planName);
+    const initialBalance = planLimits.initialVirtualBalance;
+
     await UserModel.findByIdAndUpdate(userId, {
       subscriptionId: razorpay_payment_id,   // store the PAYMENT ID (semantically correct)
       subscriptionStatus: 'active',
       currentPlan: planName || 'Silver',
       subscriptionExpiry: expiryDate,
       isOnTrial: false,
+      // Credit the plan's starting virtual balance (source of truth: src/config/plans.ts)
+      virtualBalance: initialBalance,
+      initialVirtualBalance: initialBalance,
+      virtualBalanceLastReset: new Date(),
     });
 
     // ── Mark PaymentRecord as Paid ────────────────────────────────
@@ -272,6 +281,10 @@ export const initiateTrial = async (req: AuthRequest, res: Response) => {
     const expiryDate = new Date();
     expiryDate.setDate(expiryDate.getDate() + 7);
 
+    // Grant the plan's initial virtual balance for trial too
+    const planLimits = getPlanLimits(planName);
+    const initialBalance = planLimits.initialVirtualBalance;
+
     await UserModel.findByIdAndUpdate(userId, {
       subscriptionStatus: 'active',
       currentPlan: planName,
@@ -279,6 +292,10 @@ export const initiateTrial = async (req: AuthRequest, res: Response) => {
       isOnTrial: true,
       hasUsedTrial: true,
       trialEndDate: expiryDate,
+      // Credit the plan's starting virtual balance (source of truth: src/config/plans.ts)
+      virtualBalance: initialBalance,
+      initialVirtualBalance: initialBalance,
+      virtualBalanceLastReset: new Date(),
     });
 
     return res.status(200).json({
@@ -346,12 +363,20 @@ export const handleWebhook = async (req: Request, res: Response) => {
             const expiryDate = new Date();
             expiryDate.setMonth(expiryDate.getMonth() + record.duration);
 
+            // Grant the plan's initial virtual balance
+            const planLimits = getPlanLimits(record.planName);
+            const initialBalance = planLimits.initialVirtualBalance;
+
             await UserModel.findByIdAndUpdate(record.userId, {
               subscriptionId: paymentId,
               subscriptionStatus: 'active',
               currentPlan: record.planName,
               subscriptionExpiry: expiryDate,
               isOnTrial: false,
+              // Credit the plan's starting virtual balance (source of truth: src/config/plans.ts)
+              virtualBalance: initialBalance,
+              initialVirtualBalance: initialBalance,
+              virtualBalanceLastReset: new Date(),
             });
 
             record.razorpayPaymentId = paymentId;
