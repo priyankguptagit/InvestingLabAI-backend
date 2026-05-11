@@ -3,6 +3,7 @@ import argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { Types } from "mongoose";
+import { getPlanLimits } from "../config/plans";
 
 import {
   sendVerificationEmail,
@@ -497,11 +498,18 @@ export class UserService {
     const expiry = new Date(now);
     expiry.setMonth(expiry.getMonth() + months);
 
+    // Grant the plan's initial virtual balance (source of truth: src/config/plans.ts)
+    const planLimits = getPlanLimits(planName);
+    const initialBalance = planLimits.initialVirtualBalance;
+
     user.currentPlan = planName;
     user.subscriptionStatus = 'active';
     user.subscriptionExpiry = expiry;
     user.isOnTrial = false;
     user.trialEndDate = undefined;
+    user.virtualBalance = initialBalance;
+    user.initialVirtualBalance = initialBalance;
+    user.virtualBalanceLastReset = new Date();
     await user.save();
 
     // Create an admin-override payment record (amountPaise = 0, no real charge)

@@ -16,7 +16,8 @@ class PaperTradingService {
     orderType: 'MARKET' | 'LIMIT' | 'STOP_LOSS',
     limitPrice?: number,
     stopLossPrice?: number,
-    reason?: string
+    reason?: string,
+    expectedPrice?: number
   ) {
     const session = await mongoose.startSession();
     session.startTransaction();
@@ -37,7 +38,16 @@ class PaperTradingService {
       if (!stockData) throw new Error(`Stock ${symbol} not found`);
 
       const currentPrice = stockData.price;
-      const executionPrice = orderType === 'LIMIT' && limitPrice ? limitPrice : currentPrice;
+      
+      let executionPrice = currentPrice;
+      if (orderType === 'MARKET' && expectedPrice) {
+         // In a paper trading environment, we should trust the expected price
+         // provided by the user's live chart to ensure perfect math consistency.
+         executionPrice = expectedPrice;
+      } else if (orderType === 'LIMIT' && limitPrice) {
+         executionPrice = limitPrice;
+      }
+      
       const totalAmount = executionPrice * quantity;
 
       // 3. Validate trade based on type
@@ -255,7 +265,7 @@ class PaperTradingService {
   async getPortfolio(userId: string) {
     try {
       // 1. Fetch the user to get the real-time balance
-      const user = await UserModel.findById(userId).select('virtualBalance').lean();
+      const user = await UserModel.findById(userId).select('virtualBalance initialVirtualBalance totalPaperPL').lean() as any;
       
       // 2. Fetch holdings
       const holdings = await PortfolioHolding.find({ userId })
@@ -271,10 +281,14 @@ class PaperTradingService {
               .lean();
             
             if (latestStock) {
-              const currentPrice = latestStock.price;
+              // Only update if the stock data is newer than the holding's last known price update
+              // This prevents a stale DB price from overriding a freshly executed trade's live price
+              const isNewer = new Date(latestStock.timestamp) > new Date(holding.lastUpdated);
+              
+              const currentPrice = isNewer ? latestStock.price : holding.currentPrice;
               const currentValue = currentPrice * holding.quantity;
               const unrealizedPL = (currentPrice - holding.averageBuyPrice) * holding.quantity;
-              const unrealizedPLPercent = ((currentPrice - holding.averageBuyPrice) / holding.averageBuyPrice) * 100;
+              const unrealizedPLPercent = holding.averageBuyPrice > 0 ? ((currentPrice - holding.averageBuyPrice) / holding.averageBuyPrice) * 100 : 0;
 
               // Update in database
               await PortfolioHolding.updateOne(
@@ -315,6 +329,8 @@ class PaperTradingService {
       return {
         // Add the retrieved balance here. Default to 100000 if user not found/balance missing.
         availableBalance: user?.virtualBalance ?? 100000, 
+        initialBalance: user?.initialVirtualBalance ?? 100000,
+        realizedPL: user?.totalPaperPL ?? 0,
         
         holdings: updatedHoldings,
         summary: {

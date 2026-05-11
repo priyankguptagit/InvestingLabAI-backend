@@ -49,7 +49,8 @@ export const executePaperTrade = async (req: Request, res: Response) => {
       orderType = 'MARKET',
       limitPrice,
       stopLossPrice,
-      reason
+      reason,
+      expectedPrice
     } = req.body;
 
     // Validation
@@ -120,7 +121,8 @@ export const executePaperTrade = async (req: Request, res: Response) => {
       orderType,
       limitPrice,
       stopLossPrice,
-      reason.trim()
+      reason.trim(),
+      expectedPrice
     );
 
     res.status(200).json({

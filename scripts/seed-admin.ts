@@ -24,7 +24,7 @@ if (!MONGODB_URI) {
 
 const email = process.argv[2];
 const password = process.argv[3];
-const role = process.argv[4] || 'super_admin';
+const role = (process.argv[4] || 'super_admin') as 'super_admin' | 'admin' | 'employee';
 
 if (!email || !password) {
     console.error('❌  Missing required arguments.');
