@@ -83,17 +83,40 @@ export class OrganizationService {
 
     const hashedPassword = await argon2.hash(password);
 
-    // Create Organization Admin
-    const orgAdmin = await OrganizationAdminModel.create({
-      organization: organization._id,
-      name: organization.registeredBy.name,
-      email: organization.registeredBy.email,
-      mobile: organization.contactPhone,
-      designation: organization.registeredBy.designation as any,
-      passwordHash: hashedPassword,
-      isVerified: true,
-      isActive: true
+    // Normalize designation to lowercase to match enum — handles legacy registrations
+    // where the designation was stored with mixed case (e.g. "Dean" instead of "dean")
+    const rawDesignation = organization.registeredBy.designation || 'other';
+    const normalizedDesignation = rawDesignation.toLowerCase();
+    const validDesignations = ['dean', 'director', 'principal', 'admin', 'other'];
+    const designation = validDesignations.includes(normalizedDesignation)
+      ? normalizedDesignation as 'dean' | 'director' | 'principal' | 'admin' | 'other'
+      : 'other';
+
+    // Idempotent admin creation: if a previous verify attempt partially succeeded
+    // and left an admin record, reuse it rather than failing with a duplicate key error.
+    let orgAdmin = await OrganizationAdminModel.findOne({
+      email: organization.registeredBy.email
     });
+
+    if (!orgAdmin) {
+      // Create Organization Admin
+      orgAdmin = await OrganizationAdminModel.create({
+        organization: organization._id,
+        name: organization.registeredBy.name,
+        email: organization.registeredBy.email,
+        mobile: organization.contactPhone,
+        designation,
+        passwordHash: hashedPassword,
+        isVerified: true,
+        isActive: true
+      });
+    } else {
+      // Admin already exists from a previous failed attempt — just update the password
+      orgAdmin.passwordHash = hashedPassword;
+      orgAdmin.isVerified = true;
+      orgAdmin.isActive = true;
+      await orgAdmin.save();
+    }
 
     organization.isVerified = true;
     organization.verificationToken = undefined;
@@ -109,6 +132,7 @@ export class OrganizationService {
       refreshToken
     };
   }
+
 
   // Login Organization Admin
   async login(email: string, password: string, rememberMe: boolean = false) {
