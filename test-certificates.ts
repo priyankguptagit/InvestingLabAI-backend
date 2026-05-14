@@ -6,7 +6,7 @@ import connectDB from './src/config/database';
 dotenv.config();
 
 async function runTest() {
-  console.log('--- Starting Certificate Generation Test ---');
+  console.log('---... Starting Certificate Generation Test ---');
   
   // Connect to DB
   await connectDB();
